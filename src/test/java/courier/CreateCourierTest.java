@@ -19,24 +19,20 @@ public class CreateCourierTest {
 
     private CourierClient courierClient;
     private Courier courier;
-    private int courierId;
 
     @Before
     public void setUp() {
         courierClient = new CourierClient();
         courier = CourierGenerator.getRandomCourier();
-        courierId = 0;
     }
 
     @After
     public void tearDown() {
-        if (courierId != 0) {
-            courierClient.deleteCourier(courierId);
-        } else if (courier != null && courier.getLogin() != null && courier.getPassword() != null) {
+        if (courier != null && courier.getLogin() != null && courier.getPassword() != null) {
             Response loginResponse = courierClient.loginCourier(CourierCredentials.from(courier));
             if (loginResponse.statusCode() == HttpStatus.SC_OK) {
-                int id = loginResponse.path("id");
-                courierClient.deleteCourier(id);
+                int courierId = loginResponse.path("id");
+                courierClient.deleteCourier(courierId);
             }
         }
     }
@@ -50,9 +46,6 @@ public class CreateCourierTest {
                 .assertThat()
                 .statusCode(HttpStatus.SC_CREATED)
                 .body("ok", is(true));
-
-        Response loginResponse = courierClient.loginCourier(CourierCredentials.from(courier));
-        courierId = loginResponse.path("id");
     }
 
     @Test
@@ -102,8 +95,5 @@ public class CreateCourierTest {
                 .assertThat()
                 .statusCode(HttpStatus.SC_CREATED)
                 .body("ok", is(true));
-
-        Response loginResponse = courierClient.loginCourier(CourierCredentials.from(courier));
-        courierId = loginResponse.path("id");
     }
 }
